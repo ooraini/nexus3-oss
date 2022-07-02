@@ -8,35 +8,65 @@
 # - https://github.com/ansible/ansible/pull/46255
 # - https://github.com/ansible/ansible/issues/46215
 # - https://github.com/pallets/jinja/pull/906
+- name: Initialize facts
+  set_fact:
+    _nexus_repos_maven_proxy: []
+    _nexus_repos_maven_hosted: []
+    _nexus_repos_maven_group: []
+    _nexus_repos_docker_proxy: []
+    _nexus_repos_docker_hosted: []
+    _nexus_repos_docker_group: []
+    _nexus_repos_pypi_proxy: []
+    _nexus_repos_pypi_hosted: []
+    _nexus_repos_pypi_group: []
+    _nexus_repos_raw_proxy: []
+    _nexus_repos_raw_hosted: []
+    _nexus_repos_raw_group: []
+    _nexus_repos_rubygems_proxy: []
+    _nexus_repos_rubygems_hosted: []
+    _nexus_repos_rubygems_group: []
+    _nexus_repos_bower_proxy: []
+    _nexus_repos_bower_hosted: []
+    _nexus_repos_bower_group: []
+    _nexus_repos_npm_proxy: []
+    _nexus_repos_npm_hosted: []
+    _nexus_repos_npm_group: []
+    _nexus_repos_nuget_proxy: []
+    _nexus_repos_nuget_hosted: []
+    _nexus_repos_nuget_group: []
+    _nexus_repos_gitlfs_hosted: []
+    _nexus_repos_yum_proxy: []
+    _nexus_repos_yum_hosted: []
+    _nexus_repos_yum_group: []
+    _nexus_repos_apt_proxy: []
+    _nexus_repos_apt_hosted: []
+    _nexus_repos_helm_proxy: []
+    _nexus_repos_helm_hosted: []
+    _nexus_repos_r_proxy: []
+    _nexus_repos_r_hosted: []
+    _nexus_repos_r_group: []
+    _nexus_repos_p2_proxy: []
+    _nexus_repos_r_proxy: []
+    _nexus_repos_go_proxy: []
+    _nexus_repos_go_group: []
+
 - name: Process definitions for maven
   when: nexus_config_maven | bool
   block:
     - name: apply defaults to maven proxy repos
       set_fact:
-        nexus_repos_maven_proxy: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_maven_proxy -%}
-            {{ result.append(_nexus_repos_maven_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_maven_proxy: "{{ _nexus_repos_maven_proxy + [_nexus_repos_maven_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_maven_proxy }}"
 
     - name: apply defaults to maven hosted repos
       set_fact:
-        nexus_repos_maven_hosted: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_maven_hosted -%}
-            {{ result.append(_nexus_repos_maven_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_maven_hosted: "{{ _nexus_repos_maven_hosted + [_nexus_repos_maven_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_maven_hosted }}"
 
     - name: apply defaults to maven group repos
       set_fact:
-        nexus_repos_maven_group: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_maven_group -%}
-            {{ result.append(_nexus_repos_maven_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_maven_group: "{{ _nexus_repos_maven_group + [_nexus_repos_maven_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_maven_group }}"
 
     - name: Add maven repositories to global repos list
       set_fact:
@@ -44,11 +74,11 @@
           {{
             _nexus_repos_global_list | default([])
             +
-            (nexus_repos_maven_proxy | map('combine', {"format": "maven2", "type": "proxy"}) | list)
+            (_nexus_repos_maven_proxy | map('combine', {"format": "maven2", "type": "proxy"}) | list)
             +
-            (nexus_repos_maven_hosted | map('combine', {"format": "maven2", "type": "hosted"}) | list)
+            (_nexus_repos_maven_hosted | map('combine', {"format": "maven2", "type": "hosted"}) | list)
             +
-            (nexus_repos_maven_group | map('combine', {"format": "maven2", "type": "group"}) | list)
+            (_nexus_repos_maven_group | map('combine', {"format": "maven2", "type": "group"}) | list)
           }}
 
 - name: Process definitions for docker
@@ -57,30 +87,18 @@
 
     - name: apply defaults to docker proxy repos
       set_fact:
-        nexus_repos_docker_proxy: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_docker_proxy -%}
-            {{ result.append(_nexus_repos_docker_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_docker_proxy: "{{ _nexus_repos_docker_proxy + [_nexus_repos_docker_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_docker_proxy }}"
 
     - name: apply defaults to docker hosted repos
       set_fact:
-        nexus_repos_docker_hosted: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_docker_hosted -%}
-            {{ result.append(_nexus_repos_docker_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_docker_hosted: "{{ _nexus_repos_docker_hosted + [_nexus_repos_docker_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_docker_hosted }}"
 
     - name: apply defaults to docker group repos
       set_fact:
-        nexus_repos_docker_group: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_docker_group -%}
-            {{ result.append(_nexus_repos_docker_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_docker_group: "{{ _nexus_repos_docker_group + [_nexus_repos_docker_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_docker_group }}"
 
     - name: Add docker repositories to global repos list
       set_fact:
@@ -88,11 +106,11 @@
           {{
             _nexus_repos_global_list | default([])
             +
-            (nexus_repos_docker_proxy | map('combine', {"format": "docker", "type": "proxy"}) | list)
+            (_nexus_repos_docker_proxy | map('combine', {"format": "docker", "type": "proxy"}) | list)
             +
-            (nexus_repos_docker_hosted | map('combine', {"format": "docker", "type": "hosted"}) | list)
+            (_nexus_repos_docker_hosted | map('combine', {"format": "docker", "type": "hosted"}) | list)
             +
-            (nexus_repos_docker_group | map('combine', {"format": "docker", "type": "group"}) | list)
+            (_nexus_repos_docker_group | map('combine', {"format": "docker", "type": "group"}) | list)
           }}
 
 - name: Process definitions for pypi
@@ -101,30 +119,18 @@
 
     - name: apply defaults to pypi proxy repos
       set_fact:
-        nexus_repos_pypi_proxy: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_pypi_proxy -%}
-            {{ result.append(_nexus_repos_pypi_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_pypi_proxy: "{{ _nexus_repos_pypi_proxy + [_nexus_repos_pypi_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_pypi_proxy }}"
 
     - name: apply defaults to pypi hosted repos
       set_fact:
-        nexus_repos_pypi_hosted: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_pypi_hosted -%}
-            {{ result.append(_nexus_repos_pypi_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_pypi_hosted: "{{ _nexus_repos_pypi_hosted + [_nexus_repos_pypi_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_pypi_hosted }}"
 
     - name: apply defaults to pypi group repos
       set_fact:
-        nexus_repos_pypi_group: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_pypi_group -%}
-            {{ result.append(_nexus_repos_pypi_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_pypi_group: "{{ _nexus_repos_pypi_group + [_nexus_repos_pypi_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_pypi_group }}"
 
     - name: Add pypi repositories to global repos list
       set_fact:
@@ -132,11 +138,11 @@
           {{
             _nexus_repos_global_list | default([])
             +
-            (nexus_repos_pypi_proxy | map('combine', {"format": "pypi", "type": "proxy"}) | list)
+            (_nexus_repos_pypi_proxy | map('combine', {"format": "pypi", "type": "proxy"}) | list)
             +
-            (nexus_repos_pypi_hosted | map('combine', {"format": "pypi", "type": "hosted"}) | list)
+            (_nexus_repos_pypi_hosted | map('combine', {"format": "pypi", "type": "hosted"}) | list)
             +
-            (nexus_repos_pypi_group | map('combine', {"format": "pypi", "type": "group"}) | list)
+            (_nexus_repos_pypi_group | map('combine', {"format": "pypi", "type": "group"}) | list)
           }}
 
 - name: Process definitions for raw repositories
@@ -145,30 +151,18 @@
 
     - name: apply defaults to raw proxy repos
       set_fact:
-        nexus_repos_raw_proxy: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_raw_proxy -%}
-            {{ result.append(_nexus_repos_raw_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_raw_proxy: "{{ _nexus_repos_raw_proxy + [_nexus_repos_raw_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_raw_proxy }}"
 
     - name: apply defaults to raw hosted repos
       set_fact:
-        nexus_repos_raw_hosted: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_raw_hosted -%}
-            {{ result.append(_nexus_repos_raw_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_raw_hosted: "{{ _nexus_repos_raw_hosted + [_nexus_repos_raw_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_raw_hosted }}"
 
     - name: apply defaults to raw group repos
       set_fact:
-        nexus_repos_raw_group: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_raw_group -%}
-            {{ result.append(_nexus_repos_raw_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_raw_group: "{{ _nexus_repos_raw_group + [_nexus_repos_raw_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_raw_group }}"
 
     - name: Add raw repositories to global repos list
       set_fact:
@@ -176,11 +170,11 @@
           {{
             _nexus_repos_global_list | default([])
             +
-            (nexus_repos_raw_proxy | map('combine', {"format": "raw", "type": "proxy"}) | list)
+            (_nexus_repos_raw_proxy | map('combine', {"format": "raw", "type": "proxy"}) | list)
             +
-            (nexus_repos_raw_hosted | map('combine', {"format": "raw", "type": "hosted"}) | list)
+            (_nexus_repos_raw_hosted | map('combine', {"format": "raw", "type": "hosted"}) | list)
             +
-            (nexus_repos_raw_group | map('combine', {"format": "raw", "type": "group"}) | list)
+            (_nexus_repos_raw_group | map('combine', {"format": "raw", "type": "group"}) | list)
           }}
 
 - name: Process definitions for rubygems repositories
@@ -189,30 +183,18 @@
 
     - name: apply defaults to rubygems proxy repos
       set_fact:
-        nexus_repos_rubygems_proxy: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_rubygems_proxy -%}
-            {{ result.append(_nexus_repos_rubygems_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_rubygems_proxy: "{{ _nexus_repos_rubygems_proxy + [_nexus_repos_rubygems_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_rubygems_proxy }}"
 
     - name: apply defaults to rubygems hosted repos
       set_fact:
-        nexus_repos_rubygems_hosted: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_rubygems_hosted -%}
-            {{ result.append(_nexus_repos_rubygems_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_rubygems_hosted: "{{ _nexus_repos_rubygems_hosted + [_nexus_repos_rubygems_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_rubygems_hosted }}"
 
     - name: apply defaults to rubygems group repos
       set_fact:
-        nexus_repos_rubygems_group: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_rubygems_group -%}
-            {{ result.append(_nexus_repos_rubygems_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_rubygems_group: "{{ _nexus_repos_rubygems_group + [_nexus_repos_rubygems_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_rubygems_group }}"
 
     - name: Add rubygems repositories to global repos list
       set_fact:
@@ -220,11 +202,11 @@
           {{
             _nexus_repos_global_list | default([])
             +
-            (nexus_repos_rubygems_proxy | map('combine', {"format": "rubygems", "type": "proxy"}) | list)
+            (_nexus_repos_rubygems_proxy | map('combine', {"format": "rubygems", "type": "proxy"}) | list)
             +
-            (nexus_repos_rubygems_hosted | map('combine', {"format": "rubygems", "type": "hosted"}) | list)
+            (_nexus_repos_rubygems_hosted | map('combine', {"format": "rubygems", "type": "hosted"}) | list)
             +
-            (nexus_repos_rubygems_group | map('combine', {"format": "rubygems", "type": "group"}) | list)
+            (_nexus_repos_rubygems_group | map('combine', {"format": "rubygems", "type": "group"}) | list)
           }}
 
 - name: Process definitions for bower repositories
@@ -233,30 +215,18 @@
 
     - name: apply defaults to bower proxy repos
       set_fact:
-        nexus_repos_bower_proxy: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_bower_proxy -%}
-            {{ result.append(_nexus_repos_bower_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_bower_proxy: "{{ _nexus_repos_bower_proxy + [_nexus_repos_bower_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_bower_proxy }}"
 
     - name: apply defaults to bower hosted repos
       set_fact:
-        nexus_repos_bower_hosted: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_bower_hosted -%}
-            {{ result.append(_nexus_repos_bower_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_bower_hosted: "{{ _nexus_repos_bower_hosted + [_nexus_repos_bower_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_bower_hosted }}"
 
     - name: apply defaults to bower group repos
       set_fact:
-        nexus_repos_bower_group: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_bower_group -%}
-            {{ result.append(_nexus_repos_bower_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_bower_group: "{{ _nexus_repos_bower_group + [_nexus_repos_bower_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_bower_group }}"
 
     - name: Add bower repositories to global repos list
       set_fact:
@@ -277,30 +247,18 @@
 
     - name: apply defaults to npm proxy repos
       set_fact:
-        nexus_repos_npm_proxy: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_npm_proxy -%}
-            {{ result.append(_nexus_repos_npm_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_npm_proxy: "{{ _nexus_repos_npm_proxy + [_nexus_repos_npm_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_npm_proxy }}"
 
     - name: apply defaults to npm hosted repos
       set_fact:
-        nexus_repos_npm_hosted: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_npm_hosted -%}
-            {{ result.append(_nexus_repos_npm_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_npm_hosted: "{{ _nexus_repos_npm_hosted + [_nexus_repos_npm_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_npm_hosted }}"
 
     - name: apply defaults to npm group repos
       set_fact:
-        nexus_repos_npm_group: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_npm_group -%}
-            {{ result.append(_nexus_repos_npm_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_npm_group: "{{ _nexus_repos_npm_group + [_nexus_repos_npm_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_npm_group }}"
 
     - name: Add npm repositories to global repos list
       set_fact:
@@ -308,11 +266,11 @@
           {{
             _nexus_repos_global_list | default([])
             +
-            (nexus_repos_npm_proxy | map('combine', {"format": "npm", "type": "proxy"}) | list)
+            (_nexus_repos_npm_proxy | map('combine', {"format": "npm", "type": "proxy"}) | list)
             +
-            (nexus_repos_npm_hosted | map('combine', {"format": "npm", "type": "hosted"}) | list)
+            (_nexus_repos_npm_hosted | map('combine', {"format": "npm", "type": "hosted"}) | list)
             +
-            (nexus_repos_npm_group | map('combine', {"format": "npm", "type": "group"}) | list)
+            (_nexus_repos_npm_group | map('combine', {"format": "npm", "type": "group"}) | list)
           }}
 
 - name: Process definitions for nuget repositories
@@ -321,30 +279,18 @@
 
     - name: apply defaults to nuget proxy repos
       set_fact:
-        nexus_repos_nuget_proxy: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_nuget_proxy -%}
-            {{ result.append(_nexus_repos_nuget_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_nuget_proxy: "{{ _nexus_repos_nuget_proxy + [_nexus_repos_nuget_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_nuget_proxy }}"
 
     - name: apply defaults to nuget hosted repos
       set_fact:
-        nexus_repos_nuget_hosted: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_nuget_hosted -%}
-            {{ result.append(_nexus_repos_nuget_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_nuget_hosted: "{{ _nexus_repos_nuget_hosted + [_nexus_repos_nuget_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_nuget_hosted }}"
 
     - name: apply defaults to nuget group repos
       set_fact:
-        nexus_repos_nuget_group: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_nuget_group -%}
-            {{ result.append(_nexus_repos_nuget_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_nuget_group: "{{ _nexus_repos_nuget_group + [_nexus_repos_nuget_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_nuget_group }}"
 
     - name: Add nuget repositories to global repos list
       set_fact:
@@ -352,11 +298,11 @@
           {{
             _nexus_repos_global_list | default([])
             +
-            (nexus_repos_nuget_proxy | map('combine', {"format": "nuget", "type": "proxy"}) | list)
+            (_nexus_repos_nuget_proxy | map('combine', {"format": "nuget", "type": "proxy"}) | list)
             +
-            (nexus_repos_nuget_hosted | map('combine', {"format": "nuget", "type": "hosted"}) | list)
+            (_nexus_repos_nuget_hosted | map('combine', {"format": "nuget", "type": "hosted"}) | list)
             +
-            (nexus_repos_nuget_group | map('combine', {"format": "nuget", "type": "group"}) | list)
+            (_nexus_repos_nuget_group | map('combine', {"format": "nuget", "type": "group"}) | list)
           }}
 
 - name: Process definitions for gitlfs repositories
@@ -365,12 +311,8 @@
 
     - name: apply defaults to gitlfs hosted repos
       set_fact:
-        nexus_repos_gitlfs_hosted: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_gitlfs_hosted -%}
-            {{ result.append(_nexus_repos_gitlfs_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_gitlfs_hosted: "{{ _nexus_repos_gitlfs_hosted + [_nexus_repos_gitlfs_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_gitlfs_hosted }}"
 
     - name: Add gitlfs repositories to global repos list
       set_fact:
@@ -378,7 +320,7 @@
           {{
             _nexus_repos_global_list | default([])
             +
-            (nexus_repos_gitlfs_hosted | map('combine', {"format": "gitlfs", "type": "hosted"}) | list)
+            (_nexus_repos_gitlfs_hosted | map('combine', {"format": "gitlfs", "type": "hosted"}) | list)
           }}
 
 - name: Process definitions for yum repositories
@@ -387,30 +329,18 @@
 
     - name: apply defaults to yum proxy repos
       set_fact:
-        nexus_repos_yum_proxy: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_yum_proxy -%}
-            {{ result.append(_nexus_repos_yum_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_yum_proxy: "{{ _nexus_repos_yum_proxy + [_nexus_repos_yum_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_yum_proxy }}"
 
     - name: apply defaults to yum hosted repos
       set_fact:
-        nexus_repos_yum_hosted: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_yum_hosted -%}
-            {{ result.append(_nexus_repos_yum_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_yum_hosted: "{{ _nexus_repos_yum_hosted + [_nexus_repos_yum_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_yum_hosted }}"
 
     - name: apply defaults to yum group repos
       set_fact:
-        nexus_repos_yum_group: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_yum_group -%}
-            {{ result.append(_nexus_repos_yum_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_yum_group: "{{ _nexus_repos_yum_group + [_nexus_repos_yum_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_yum_group }}"
 
     - name: Add yum repositories to global repos list
       set_fact:
@@ -418,11 +348,11 @@
           {{
             _nexus_repos_global_list | default([])
             +
-            (nexus_repos_yum_proxy | map('combine', {"format": "yum", "type": "proxy"}) | list)
+            (_nexus_repos_yum_proxy | map('combine', {"format": "yum", "type": "proxy"}) | list)
             +
-            (nexus_repos_yum_hosted | map('combine', {"format": "yum", "type": "hosted"}) | list)
+            (_nexus_repos_yum_hosted | map('combine', {"format": "yum", "type": "hosted"}) | list)
             +
-            (nexus_repos_yum_group | map('combine', {"format": "yum", "type": "group"}) | list)
+            (_nexus_repos_yum_group | map('combine', {"format": "yum", "type": "group"}) | list)
           }}
 
 - name: Process definitions for apt repositories
@@ -431,21 +361,13 @@
 
     - name: apply defaults to apt proxy repos
       set_fact:
-        nexus_repos_apt_proxy: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_apt_proxy -%}
-            {{ result.append(_nexus_repos_apt_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_apt_proxy: "{{ _nexus_repos_apt_proxy + [_nexus_repos_apt_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_apt_proxy }}"
 
     - name: apply defaults to apt hosted repos
       set_fact:
-        nexus_repos_apt_hosted: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_apt_hosted -%}
-            {{ result.append(_nexus_repos_apt_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_apt_hosted: "{{ _nexus_repos_apt_hosted + [_nexus_repos_apt_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_apt_hosted }}"
 
     - name: Add apt repositories to global repos list
       set_fact:
@@ -453,9 +375,9 @@
           {{
             _nexus_repos_global_list | default([])
             +
-            (nexus_repos_apt_proxy | map('combine', {"format": "apt", "type": "proxy"}) | list)
+            (_nexus_repos_apt_proxy | map('combine', {"format": "apt", "type": "proxy"}) | list)
             +
-            (nexus_repos_apt_hosted | map('combine', {"format": "apt", "type": "hosted"}) | list)
+            (_nexus_repos_apt_hosted | map('combine', {"format": "apt", "type": "hosted"}) | list)
           }}
 
 - name: Process definitions for helm repositories
@@ -464,21 +386,13 @@
 
     - name: apply defaults to helm proxy repos
       set_fact:
-        nexus_repos_helm_proxy: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_helm_proxy -%}
-            {{ result.append(_nexus_repos_helm_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_helm_proxy: "{{ _nexus_repos_helm_proxy + [_nexus_repos_helm_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_helm_proxy }}"
 
     - name: apply defaults to helm hosted repos
       set_fact:
-        nexus_repos_helm_hosted: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_helm_hosted -%}
-            {{ result.append(_nexus_repos_helm_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_helm_hosted: "{{ _nexus_repos_helm_hosted + [_nexus_repos_helm_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_helm_hosted }}"
 
     - name: Add helm repositories to global repos list
       set_fact:
@@ -486,9 +400,9 @@
           {{
             _nexus_repos_global_list | default([])
             +
-            (nexus_repos_helm_proxy | map('combine', {"format": "helm", "type": "proxy"}) | list)
+            (_nexus_repos_helm_proxy | map('combine', {"format": "helm", "type": "proxy"}) | list)
             +
-            (nexus_repos_helm_hosted | map('combine', {"format": "helm", "type": "hosted"}) | list)
+            (_nexus_repos_helm_hosted | map('combine', {"format": "helm", "type": "hosted"}) | list)
           }}
 
 - name: Process definitions for r
@@ -497,30 +411,18 @@
 
     - name: apply defaults to r proxy repos
       set_fact:
-        nexus_repos_r_proxy: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_r_proxy -%}
-            {{ result.append(_nexus_repos_r_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_r_proxy: "{{ _nexus_repos_r_proxy + [_nexus_repos_r_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_r_proxy }}"
 
     - name: apply defaults to r hosted repos
       set_fact:
-        nexus_repos_r_hosted: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_r_hosted -%}
-            {{ result.append(_nexus_repos_r_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_r_hosted: "{{ _nexus_repos_r_hosted + [_nexus_repos_r_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_r_hosted }}"
 
     - name: apply defaults to r group repos
       set_fact:
-        nexus_repos_r_group: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_r_group -%}
-            {{ result.append(_nexus_repos_r_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_r_group: "{{ _nexus_repos_r_group + [_nexus_repos_r_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_r_group }}"
 
     - name: Add r repositories to global repos list
       set_fact:
@@ -528,11 +430,11 @@
           {{
             _nexus_repos_global_list | default([])
             +
-            (nexus_repos_r_proxy | map('combine', {"format": "r", "type": "proxy"}) | list)
+            (_nexus_repos_r_proxy | map('combine', {"format": "r", "type": "proxy"}) | list)
             +
-            (nexus_repos_r_hosted | map('combine', {"format": "r", "type": "hosted"}) | list)
+            (_nexus_repos_r_hosted | map('combine', {"format": "r", "type": "hosted"}) | list)
             +
-            (nexus_repos_r_group | map('combine', {"format": "r", "type": "group"}) | list)
+            (_nexus_repos_r_group | map('combine', {"format": "r", "type": "group"}) | list)
           }}
 
 - name: Process definitions for p2 repositories
@@ -541,12 +443,8 @@
 
     - name: apply defaults to p2 proxy repos
       set_fact:
-        nexus_repos_p2_proxy: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_p2_proxy -%}
-            {{ result.append(_nexus_repos_p2_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_p2_proxy: "{{ _nexus_repos_p2_proxy + [_nexus_repos_p2_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_p2_proxy }}"
 
     - name: Add p2 repositories to global repos list
       set_fact:
@@ -554,7 +452,7 @@
           {{
             _nexus_repos_global_list | default([])
             +
-            (nexus_repos_p2_proxy | map('combine', {"format": "p2", "type": "proxy"}) | list)
+            (_nexus_repos_p2_proxy | map('combine', {"format": "p2", "type": "proxy"}) | list)
           }}
 
 - name: Process definitions for conda
@@ -563,12 +461,8 @@
 
     - name: apply defaults to conda proxy repos
       set_fact:
-        nexus_repos_r_proxy: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_conda_proxy -%}
-            {{ result.append(_nexus_repos_conda_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_r_proxy: "{{ _nexus_repos_r_proxy + [_nexus_repos_conda_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_r_proxy }}"
 
     - name: Add conda repositories to global repos list
       set_fact:
@@ -576,7 +470,7 @@
           {{
             _nexus_repos_global_list | default([])
             +
-            (nexus_repos_r_proxy | map('combine', {"format": "conda", "type": "proxy"}) | list)
+            (_nexus_repos_r_proxy | map('combine', {"format": "conda", "type": "proxy"}) | list)
           }}
 
 - name: Process definitions for go repositories
@@ -585,21 +479,13 @@
 
     - name: apply defaults to go proxy repos
       set_fact:
-        nexus_repos_go_proxy: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_go_proxy -%}
-            {{ result.append(_nexus_repos_go_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_go_proxy: "{{ _nexus_repos_go_proxy + [_nexus_repos_go_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_go_proxy }}"
 
     - name: apply defaults to go group repos
       set_fact:
-        nexus_repos_go_group: >-
-          {%- set result=[] -%}
-          {%- for repo in nexus_repos_go_group -%}
-            {{ result.append(_nexus_repos_go_defaults | combine(repo)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_repos_go_group: "{{ _nexus_repos_go_group + [_nexus_repos_go_defaults | combine(item)] }}"
+      loop: "{{ nexus_repos_go_group }}"
 
     - name: Add go repositories to global repos list
       set_fact:
@@ -607,7 +493,7 @@
           {{
             _nexus_repos_global_list | default([])
             +
-            (nexus_repos_go_proxy | map('combine', {"format": "go", "type": "proxy"}) | list)
+            (_nexus_repos_go_proxy | map('combine', {"format": "go", "type": "proxy"}) | list)
             +
-            (nexus_repos_go_group | map('combine', {"format": "go", "type": "group"}) | list)
+            (_nexus_repos_go_group | map('combine', {"format": "go", "type": "group"}) | list)
           }}
