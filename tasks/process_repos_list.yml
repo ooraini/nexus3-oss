@@ -46,7 +46,6 @@
     _nexus_repos_r_hosted: []
     _nexus_repos_r_group: []
     _nexus_repos_p2_proxy: []
-    _nexus_repos_r_proxy: []
     _nexus_repos_go_proxy: []
     _nexus_repos_go_group: []
 
