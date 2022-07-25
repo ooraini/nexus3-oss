@@ -86,15 +86,9 @@
       when: nexus_content_selectors | length > 0
 
     - name: apply defaults to privileges
-      # @todo: fix with easier syntax once the flip filter is released
-      # See more comments on this issue in process_repos_list.yml
       set_fact:
-        nexus_privileges: >-
-          {%- set result=[] -%}
-          {%- for privilege in nexus_privileges -%}
-            {{ result.append(_nexus_privilege_defaults | combine(privilege)) }}
-          {%- endfor -%}
-          {{ result | to_json | from_json }}
+        _nexus_privileges: "{{ (_nexus_privileges | default([])) + [_nexus_privilege_defaults | combine(item)] }}"
+      loop: "{{ nexus_privileges }}"
 
     - name: Create/Check blobstores
       when: nexus_restore_point is undefined
@@ -145,8 +139,8 @@
       include_tasks: call_script.yml
       vars:
         script_name: setup_privileges_from_list
-        args: "{{ nexus_privileges }}"
-      when: nexus_privileges | length > 0
+        args: "{{ _nexus_privileges }}"
+      when: _nexus_privileges | length > 0
 
     - name: Create/check roles
       include_tasks: call_script.yml
