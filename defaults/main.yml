@@ -464,6 +464,7 @@ _nexus_repos_docker_defaults:
   # More about Foreign Layers https://help.sonatype.com/repomanager3/formats/docker-registry/foreign-layers
   cache_foreign_layers: false  # Nexus gui default. For proxies only
   foreign_layer_url_whitelist: []  # Nexus gui default. For proxies only
+  latest_policy: false
 
 nexus_repos_docker_hosted:
   - name: docker-hosted

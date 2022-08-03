@@ -156,6 +156,11 @@ parsed_args.each { currentRepo ->
             ]
         }
 
+        // Configs for docker hosted repos
+        if (currentRepo.type == 'hosted' && currentRepo.format == 'docker') {
+            configuration.attributes['storage']['latestPolicy'] = currentRepo.latest_policy
+        }
+
         // Configs for maven hosted/proxy repos
         if (currentRepo.type in ['hosted', 'proxy'] && currentRepo.format == 'maven2') {
             configuration.attributes['maven'] = [
